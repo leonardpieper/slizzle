@@ -1,4 +1,4 @@
-package com.github.leonardpieper.slizzle.Util;
+package com.github.leonardpieper.slizzle.Tools;
 
 import com.badlogic.gdx.input.GestureDetector;
 

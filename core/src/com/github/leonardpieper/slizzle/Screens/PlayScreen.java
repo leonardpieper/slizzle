@@ -5,7 +5,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -19,17 +18,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.leonardpieper.slizzle.Scenes.Hud;
 import com.github.leonardpieper.slizzle.Slizzle;
 import com.github.leonardpieper.slizzle.Sprites.Emoji;
-import com.github.leonardpieper.slizzle.Util.SimpleDirectionGestureDetector;
+import com.github.leonardpieper.slizzle.Tools.B2WorldCreater;
+import com.github.leonardpieper.slizzle.Tools.SimpleDirectionGestureDetector;
 
 /**
  * Created by Leonard on 02.02.2017.
@@ -76,23 +71,7 @@ public class PlayScreen implements Screen {
 
         player = new Emoji(world);
 
-        BodyDef bdef = new BodyDef();
-        PolygonShape shape = new PolygonShape();
-        FixtureDef fdef = new FixtureDef();
-        Body body;
-
-        for(MapObject object : map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)){
-            Rectangle rect = ((RectangleMapObject) object).getRectangle();
-
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set((rect.getX() + rect.getWidth()/2) / Slizzle.PPM, (rect.getY() + rect.getHeight() / 2) / Slizzle.PPM);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox((rect.getWidth() / 2) / Slizzle.PPM, (rect.getHeight() / 2) / Slizzle.PPM);
-            fdef.shape = shape;
-            body.createFixture(fdef);
-        }
+        new B2WorldCreater(world, map);
 
         Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
 
@@ -125,29 +104,37 @@ public class PlayScreen implements Screen {
 
     public void handleInput(float dt){
         if(Gdx.input.isKeyJustPressed(Input.Keys.UP))
+            player.b2body.setLinearVelocity(0,0);
             player.b2body.applyLinearImpulse(new Vector2(0, 1f), player.b2body.getWorldCenter(), true);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN))
+            player.b2body.setLinearVelocity(0,0);
             player.b2body.applyLinearImpulse(new Vector2(0, -1f), player.b2body.getWorldCenter(), true);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x<=2)
+            player.b2body.setLinearVelocity(0,0);
             player.b2body.applyLinearImpulse(new Vector2(1f, 0), player.b2body.getWorldCenter(), true);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x>=-2)
+            player.b2body.setLinearVelocity(0,0);
             player.b2body.applyLinearImpulse(new Vector2(-1f, 0), player.b2body.getWorldCenter(), true);
     }
     public void handleSwipe(int dir){
         switch (dir){
             case 0:
+                player.b2body.setLinearVelocity(0,0);
                 player.b2body.applyLinearImpulse(new Vector2(0, 1f), player.b2body.getWorldCenter(), true);
                 break;
             case 1:
+                player.b2body.setLinearVelocity(0,0);
                 player.b2body.applyLinearImpulse(new Vector2(0, -1f), player.b2body.getWorldCenter(), true);
                 break;
             case 2:
+                player.b2body.setLinearVelocity(0,0);
                 player.b2body.applyLinearImpulse(new Vector2(1f, 0), player.b2body.getWorldCenter(), true);
                 break;
             case 3:
+                player.b2body.setLinearVelocity(0,0);
                 player.b2body.applyLinearImpulse(new Vector2(-1f, 0), player.b2body.getWorldCenter(), true);
                 break;
         }
@@ -205,6 +192,10 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        map.dispose();
+        renderer.dispose();
+        world.dispose();
+        b2dr.dispose();
+        hud.dispose();
     }
 }
